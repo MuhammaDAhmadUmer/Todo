@@ -17,8 +17,16 @@ class UserModel {
     this.status,
   });
 
+  // NOTE: the real API's GET /users/profile returns the user fields
+  // flat (e.g. {"_id": ..., "name": ..., "email": ...}) rather than
+  // wrapped in a "user" key. This handles both shapes so the model
+  // works whether the response is wrapped or flat.
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    user: json["user"] == null ? null : User.fromJson(json["user"]),
+    user: json["user"] != null
+        ? User.fromJson(json["user"])
+        : (json["_id"] != null || json["email"] != null
+            ? User.fromJson(json)
+            : null),
     status: json["status"],
   );
 
